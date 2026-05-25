@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>富鼎分會 BOD 八週作戰 — 職務視角</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: #f5f0eb;
+    padding: 24px;
+    color: #1a1a1a;
+  }
+
+  /* ── View tabs ── */
+  .view-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .view-tabs a {
+    flex: 1;
+    text-align: center;
+    padding: 12px 16px;
+    background: #fff;
+    color: #666;
+    text-decoration: none;
+    font-weight: 700;
+    border-radius: 10px;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.15s;
+  }
+  .view-tabs a:hover { background: #f5f5f5; color: #1a1a1a; }
+  .view-tabs a.active {
+    background: linear-gradient(135deg, #8B0000 0%, #c0392b 100%);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(139,0,0,0.25);
+  }
+
+  /* ── Header ── */
+  .page-header {
+    background: linear-gradient(135deg, #8B0000 0%, #c0392b 100%);
+    border-radius: 14px;
+    padding: 22px 32px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 18px rgba(139,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .page-header h1 { color: #fff; font-size: 22px; font-weight: 800; letter-spacing: 1px; }
+  .page-header .meta { color: rgba(255,255,255,0.8); font-size: 13px; margin-top: 4px; }
+  .purpose-badge {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #fff;
+    font-size: 12px;
+    text-align: center;
+    line-height: 1.6;
+  }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #444; }
+  .legend-dot { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+
+  /* ── Gantt wrapper ── */
+  .gantt-wrapper {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.08);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .week-header-row,
+  .section-header,
+  .task-row,
+  .sep-row,
+  .gantt-footer {
+    min-width: 1020px;
+  }
+
+  /* Swipe hint (mobile only) */
+  .swipe-hint {
+    display: none;
+    text-align: center;
+    font-size: 12px;
+    color: #8B0000;
+    padding: 10px;
+    background: #fff;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  @media (max-width: 768px) {
+    body { padding: 12px; }
+    .view-tabs a { font-size: 12px; padding: 10px 12px; }
+    .page-header {
+      flex-direction: column;
+      gap: 14px;
+      padding: 18px 20px;
+      text-align: center;
+      align-items: stretch;
+    }
+    .page-header h1 { font-size: 18px; line-height: 1.4; }
+    .page-header .meta { font-size: 11px; }
+    .purpose-badge { font-size: 11px; padding: 10px 14px; }
+    .legend { padding: 10px 12px; gap: 8px; }
+    .legend-item { font-size: 11px; }
+    .swipe-hint { display: block; }
+    .summary-row { gap: 8px; }
+    .summary-card {
+      min-width: calc(50% - 4px);
+      padding: 10px 14px;
+    }
+    .summary-card .sc-num { font-size: 22px; }
+    .summary-card .sc-label { font-size: 10px; }
+  }
+
+  /* ── Week header row ── */
+  .week-header-row {
+    display: grid;
+    grid-template-columns: 220px repeat(8, minmax(80px, 1fr)) 160px;
+    background: #2e2e2e;
+  }
+  .wh-label {
+    padding: 12px 14px;
+    color: #aaa;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-right: 1px solid #444;
+    display: flex;
+    align-items: center;
+  }
+  .wh-week {
+    padding: 10px 4px;
+    text-align: center;
+    border-right: 1px solid #444;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+  .wh-week .w-num { font-size: 15px; font-weight: 900; }
+  .wh-week .w-date { font-size: 10px; color: #aaa; margin-top: 2px; }
+  .wh-week.special { background: rgba(192,57,43,0.35); }
+  .wh-notes {
+    padding: 10px 12px;
+    color: #aaa;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+  }
+
+  /* ── Task row ── */
+  .task-row {
+    display: grid;
+    grid-template-columns: 220px repeat(8, minmax(80px, 1fr)) 160px;
+    border-top: 1px solid #f0f0f0;
+    transition: background 0.15s;
+  }
+  .task-row:hover { background: #fafafa; }
+
+  .task-label {
+    padding: 9px 14px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #2a2a2a;
+    border-right: 1px solid #e8e8e8;
+    display: flex;
+    align-items: center;
+    line-height: 1.4;
+  }
+
+  .task-cell {
+    border-right: 1px solid #eeeeee;
+    padding: 6px 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    min-height: 42px;
+  }
+
+  /* Bar */
+  .bar {
+    height: 24px;
+    border-radius: 5px;
+    width: 88%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.3px;
+    position: relative;
+    cursor: default;
+    transition: filter 0.15s, transform 0.15s;
+  }
+  .bar:hover { filter: brightness(1.1); transform: scaleY(1.06); }
+
+  .task-notes {
+    padding: 8px 12px;
+    font-size: 11px;
+    color: #666;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    border-left: 1px solid #eee;
+  }
+
+  /* Colors */
+  .c-blue   { background: #3A7BD5; }
+  .c-green  { background: #5B9A5B; }
+  .c-orange { background: #D46020; }
+  .c-red    { background: #C0392B; }
+  .c-dark   { background: #8B0000; }
+  .c-purple { background: #6B3FA0; }
+  .c-teal   { background: #0097A7; }
+  .c-amber  { background: #E8A020; }
+
+  .closed-col { background: rgba(192,57,43,0.05); }
+
+  .sep-row {
+    display: grid;
+    grid-template-columns: 220px repeat(8, minmax(80px, 1fr)) 160px;
+    background: #f8f8f8;
+    border-top: 2px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  .sep-label {
+    padding: 5px 14px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    grid-column: 1 / -1;
+    color: #888;
+  }
+
+  /* Footer */
+  .gantt-footer {
+    display: grid;
+    grid-template-columns: 220px repeat(8, minmax(80px, 1fr)) 160px;
+    background: #f5f5f5;
+    border-top: 2px solid #ddd;
+  }
+  .gf-cell {
+    padding: 8px 4px;
+    font-size: 10px;
+    color: #888;
+    text-align: center;
+    border-right: 1px solid #e0e0e0;
+    line-height: 1.4;
+  }
+  .gf-label { padding: 8px 14px; font-size: 11px; color: #666; font-weight: 700; }
+
+  /* Tooltip */
+  .tooltip {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    color: #fff;
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 100;
+    pointer-events: none;
+  }
+  .bar:hover .tooltip { display: block; }
+
+  .summary-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .summary-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px 18px;
+    flex: 1;
+    min-width: 160px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border-left: 4px solid #ccc;
+  }
+  .summary-card .sc-num { font-size: 28px; font-weight: 900; color: #1a1a1a; }
+  .summary-card .sc-label { font-size: 11px; color: #777; margin-top: 2px; }
+
+  /* BOD day full-width row */
+  .bod-day-cell {
+    grid-column: 2 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    color: #8B0000;
+    font-weight: 800;
+    font-size: 13px;
+    border-right: 1px solid #eeeeee;
+    text-align: center;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<!-- View tabs -->
+<div class="view-tabs">
+  <a href="index.html">📅 任務視角</a>
+  <a href="by-role.html" class="active">👥 職務視角</a>
+</div>
+
+<!-- Header -->
+<div class="page-header">
+  <div>
+    <h1>👥 富鼎分會｜BOD 八週作戰｜職務視角</h1>
+    <div class="meta">2026/8/28（週五）｜ 每個職務每週的具體任務一目了然</div>
+  </div>
+  <div class="purpose-badge">
+    每個職務各司其職<br>
+    才能撐起一場成功的 BOD
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot c-blue"></div>啟動/備戰</div>
+  <div class="legend-item"><div class="legend-dot c-red"></div>Power Day 主持/參與</div>
+  <div class="legend-item"><div class="legend-dot c-green"></div>邀請函行政</div>
+  <div class="legend-item"><div class="legend-dot c-orange"></div>邀請函郵寄/場地細節</div>
+  <div class="legend-item"><div class="legend-dot c-dark"></div>來賓熱度/接待</div>
+  <div class="legend-item"><div class="legend-dot c-purple"></div>跟進/督導</div>
+  <div class="legend-item"><div class="legend-dot c-teal"></div>培訓/輔導</div>
+  <div class="legend-item"><div class="legend-dot c-amber"></div>咖啡會議</div>
+  <div class="legend-item" style="margin-left:auto;color:#C0392B;font-weight:700;font-size:12px;">🔒 = 封閉會議</div>
+</div>
+
+<!-- Swipe hint -->
+<div class="swipe-hint">← 左右滑動檢視完整職務表 →</div>
+
+<!-- Role gantt -->
+<div class="gantt-wrapper">
+
+  <!-- Week header row -->
+  <div class="week-header-row">
+    <div class="wh-label">職務 / 角色</div>
+    <div class="wh-week"><div class="w-num">W1</div><div class="w-date">7/3</div></div>
+    <div class="wh-week"><div class="w-num">W2</div><div class="w-date">7/10</div></div>
+    <div class="wh-week special"><div class="w-num">W3🔒</div><div class="w-date">7/17</div></div>
+    <div class="wh-week"><div class="w-num">W4</div><div class="w-date">7/24</div></div>
+    <div class="wh-week"><div class="w-num">W5</div><div class="w-date">7/31</div></div>
+    <div class="wh-week"><div class="w-num">W6</div><div class="w-date">8/7</div></div>
+    <div class="wh-week"><div class="w-num">W7</div><div class="w-date">8/14</div></div>
+    <div class="wh-week special"><div class="w-num">W8🔒</div><div class="w-date">8/21</div></div>
+    <div class="wh-notes">核心職責</div>
+  </div>
+
+  <!-- ▶ 領導核心 -->
+  <div class="sep-row"><div class="sep-label">▶ 領導核心</div></div>
+
+  <div class="task-row">
+    <div class="task-label">👑 主席（歐老大）</div>
+    <div class="task-cell"><div class="bar c-blue" style="font-size:9px">啟動<div class="tooltip">W1｜BOD 目標宣告、執委成軍、場地簽約</div></div></div>
+    <div class="task-cell"></div>
+    <div class="task-cell closed-col"><div class="bar c-red" style="font-size:9px">PD 共識<div class="tooltip">W3｜主持 Power Day「團隊共識」段</div></div></div>
+    <div class="task-cell"><div class="bar c-purple" style="font-size:9px">督導發信<div class="tooltip">W4｜督導發信、初步跟進游離會員</div></div></div>
+    <div class="task-cell"><div class="bar c-purple" style="font-size:9px">介入<div class="tooltip">W5｜唱名後私下接觸未繳的游離會員</div></div></div>
+    <div class="task-cell"><div class="bar c-purple" style="font-size:9px">督導寄出<div class="tooltip">W6｜督導統一郵寄</div></div></div>
+    <div class="task-cell"><div class="bar c-dark" style="font-size:9px">確認人數<div class="tooltip">W7｜確認最終出席人數</div></div></div>
+    <div class="task-cell closed-col"><div class="bar c-dark" style="font-size:9px">督導排練<div class="tooltip">W8｜督導工作分配、流程排練、布置</div></div></div>
+    <div class="task-notes">整體策略 × 督導 × 游離會員</div>
+  </div>
+
+  <div class="task-row">
+    <div class="task-label">🌱 成長協調員</div>
+    <div class="task-cell"><div class="bar c-blue" style="font-size:9px">啟動<div class="tooltip">W1｜執委分工、目標宣告</div></div></div>
+    <div class="task-cell"><div class="bar c-blue" style="font-size:9px">備戰<div class="tooltip">W2｜PD 工具包設計 + 主視覺/邀請卡設計</div></div></div>
+    <div class="task-cell closed-col"><div class="bar c-red" style="font-size:9px">PD 主持<div class="tooltip">W3｜Power Day 全程主持（含服務鏈缺口主持）</div></div></div>
+    <div class="task-cell"><div class="bar c-purple" style="font-size:9px">督導發信<div class="tooltip">W4｜督導秘書財務發信、跟進游離會員</div></div></div>
+    <div class="task-cell"><div class="bar c-green" style="font-size:9px">主持收信<div class="tooltip">W5｜主持例會唱名一天收齊</div></div></div>
+    <div class="task-cell"><div class="bar c-orange" style="font-size:9px">督導寄出<div class="tooltip">W6｜督導統一郵寄、追蹤未繳</div></div></div>
+    <div class="task-cell"><div class="bar c-dark" style="font-size:9px">督導熱度<div class="tooltip">W7｜督導熱度管理、配對表初稿</div></div></div>
+    <div class="task-cell closed-col"><div class="bar c-dark" style="font-size:9px">排練主持<div class="tooltip">W8｜工作分配定案、流程排練主持</div></div></div>
+    <div class="task-notes">執行系統第一線（最重）</div>
+  </div>
+
+  <!-- ▶ 例會培訓 × 來賓接待 -->
+  <div class="sep-row"><div class="sep-label">▶ 例會培訓 × 來賓接待</div></div>
+
+  <div class="task-row">
+    <div class="task-label">🎓 教育協調員</div>
+    <div class="task-cell"><div class="bar c-teal" style="font-size:9px">BOD 目的<div class="tooltip">W1｜三分鐘培訓「BOD 真正目的」</div></div></div>
+    <div class="task-cell"><div class="bar c-teal" style="font-size:9px">PD 架構<div class="tooltip">W2｜三分鐘培訓「Power Day 四大架構」</div></div></div>
+    <div class="task-cell closed-col"><div class="bar c-red" style="font-size:9px">PD 開心門<div class="tooltip">W3｜主持 Power Day「開心門」段</div></div></div>
+    <div class="task-cell"><div class="bar c-teal" style="font-size:9px">邀賓話術<div class="tooltip">W4｜三分鐘培訓「邀賓話術 + 拒絕應對」</div></div></div>
+    <div class="task-cell"><div class="bar c-teal" style="font-size:9px">成功故事<div class="tooltip">W5｜三分鐘培訓「邀賓成功故事」</div></div></div>
+    <div class="task-cell"><div class="bar c-teal" style="font-size:9px">賓客體驗<div class="tooltip">W6｜三分鐘培訓「賓客當天體驗」+ 賓客 LINE 群組互動</div></div></div>
+    <div class="task-cell"><div class="bar c-teal" style="font-size:9px">入會說明<div class="tooltip">W7｜三分鐘培訓「入會說明話術」+ 群組互動</div></div></div>
+    <div class="task-cell closed-col"></div>
+    <div class="task-notes">每週三分鐘培訓 × 賓客群組</div>
+  </div>
+
+  <div class="task-row">
+    <div class="task-label">🤝 導師協調員</div>
+    <div class="task-cell"></div><div class="task-cell"></div><div class="task-cell closed-col"></div>
+    <div class="task-cell"><div class="bar c-teal" style="font-size:9px">啟動<div class="tooltip">W4｜主動聯繫新生，協助確認名單</div></div></div>
+    <div class="task-cell"><div class="bar c-teal" style="font-size:9px">輔導<div class="tooltip">W5｜完成新生 1-1 輔導</div></div></div>
+    <div class="task-cell"><div class="bar c-teal" style="font-size:9px">關注<div class="tooltip">W6｜持續關注新生賓客狀況</div></div></div>
+    <div class="task-cell"><div class="bar c-teal" style="font-size:9px">跟進<div class="tooltip">W7｜持續跟進新生賓客出席意願</div></div></div>
+    <div class="task-cell closed-col"></div>
+    <div class="task-notes">新生邀賓全程輔導</div>
+  </div>
+
+  <div class="task-row">
+    <div class="task-label">🏨 接待組長</div>
+    <div class="task-cell"><div class="bar c-blue" style="font-size:9px">場地簽約<div class="tooltip">W1｜飯店場地對接、簽約、預算確認</div></div></div>
+    <div class="task-cell"></div>
+    <div class="task-cell closed-col"></div>
+    <div class="task-cell"></div>
+    <div class="task-cell"></div>
+    <div class="task-cell"><div class="bar c-orange" style="font-size:9px">場地細節<div class="tooltip">W6｜音響投影測試預約、座位配置確認</div></div></div>
+    <div class="task-cell"><div class="bar c-dark" style="font-size:9px">接龍主導<div class="tooltip">W7｜賓客接龍主導、確認最終人數、賓客 LINE 群組</div></div></div>
+    <div class="task-cell closed-col"><div class="bar c-dark" style="font-size:9px">布置<div class="tooltip">W8｜賓客照顧責任制安排 + 前夜布置</div></div></div>
+    <div class="task-notes">場地 × 賓客當天體驗</div>
+  </div>
+
+  <!-- ▶ 行政 × 邀請函系統 -->
+  <div class="sep-row"><div class="sep-label">▶ 行政 × 邀請函系統</div></div>
+
+  <div class="task-row">
+    <div class="task-label">📋 秘書財務</div>
+    <div class="task-cell"></div>
+    <div class="task-cell"></div>
+    <div class="task-cell closed-col"><div class="bar c-blue" style="font-size:9px">印邀請函<div class="tooltip">W3｜送印 + 取件（封閉週由執委會處理）</div></div></div>
+    <div class="task-cell"><div class="bar c-green" style="font-size:9px">發邀請函<div class="tooltip">W4｜發空白邀請函給全體會員，說明規則</div></div></div>
+    <div class="task-cell"><div class="bar c-green" style="font-size:9px">當天登錄<div class="tooltip">W5｜收齊後當天登錄賓客名單，建立統計表</div></div></div>
+    <div class="task-cell"><div class="bar c-orange" style="font-size:9px">郵寄+熱度<div class="tooltip">W6｜統一郵寄給賓客 + 賓客熱度表 + 配對表初稿</div></div></div>
+    <div class="task-cell"><div class="bar c-dark" style="font-size:9px">電話確認<div class="tooltip">W7｜逐一電話確認賓客出席</div></div></div>
+    <div class="task-cell closed-col"><div class="bar c-dark" style="font-size:9px">配對定案<div class="tooltip">W8｜入會說明配對表定案公告</div></div></div>
+    <div class="task-notes">邀請函主責 × 賓客資料</div>
+  </div>
+
+  <div class="task-row">
+    <div class="task-label">👥 小組長<br><span style="font-size:10px;color:#999;font-weight:400">（主席旗下）</span></div>
+    <div class="task-cell"></div><div class="task-cell"></div><div class="task-cell closed-col"></div>
+    <div class="task-cell"><div class="bar c-purple" style="font-size:9px">啟動<div class="tooltip">W4｜確認組員邀賓名單，協助卡關者</div></div></div>
+    <div class="task-cell"><div class="bar c-purple" style="font-size:9px">追蹤①<div class="tooltip">W5｜唱名後私下跟進未繳組員</div></div></div>
+    <div class="task-cell"><div class="bar c-purple" style="font-size:9px">追蹤②<div class="tooltip">W6｜截止前最後督促</div></div></div>
+    <div class="task-cell"><div class="bar c-purple" style="font-size:9px">確認<div class="tooltip">W7｜協助確認組員賓客是否已接龍</div></div></div>
+    <div class="task-cell closed-col"></div>
+    <div class="task-notes">各組組員邀賓跟進</div>
+  </div>
+
+  <div class="task-row">
+    <div class="task-label">📊 邀賓組長</div>
+    <div class="task-cell"></div><div class="task-cell"></div><div class="task-cell closed-col"></div>
+    <div class="task-cell"><div class="bar c-purple" style="font-size:9px">上線<div class="tooltip">W4｜計分板正式上線</div></div></div>
+    <div class="task-cell"><div class="bar c-purple" style="font-size:9px">更新①<div class="tooltip">W5｜每週更新計分板</div></div></div>
+    <div class="task-cell"><div class="bar c-purple" style="font-size:9px">更新②<div class="tooltip">W6｜每週更新計分板</div></div></div>
+    <div class="task-cell"><div class="bar c-purple" style="font-size:9px">更新③<div class="tooltip">W7｜每週更新計分板</div></div></div>
+    <div class="task-cell closed-col"></div>
+    <div class="task-notes">LINE 群每週公告計分板</div>
+  </div>
+
+  <!-- ▶ 宣傳 × 全員 -->
+  <div class="sep-row"><div class="sep-label">▶ 宣傳 × 全體會員</div></div>
+
+  <div class="task-row">
+    <div class="task-label">📱 網站管理員<br><span style="font-size:10px;color:#999;font-weight:400">（主席旗下）</span></div>
+    <div class="task-cell"></div>
+    <div class="task-cell"><div class="bar c-blue" style="font-size:9px">宣傳①<div class="tooltip">W2｜社群第一波暖場貼文</div></div></div>
+    <div class="task-cell closed-col"></div>
+    <div class="task-cell"></div>
+    <div class="task-cell"></div>
+    <div class="task-cell"><div class="bar c-orange" style="font-size:9px">宣傳②<div class="tooltip">W6｜Countdown 21 天</div></div></div>
+    <div class="task-cell"><div class="bar c-dark" style="font-size:9px">宣傳③<div class="tooltip">W7｜短影片 + 會員表揚</div></div></div>
+    <div class="task-cell closed-col"></div>
+    <div class="task-notes">社群媒體三波宣傳</div>
+  </div>
+
+  <div class="task-row">
+    <div class="task-label">🙋 全體會員</div>
+    <div class="task-cell"><div class="bar c-amber" style="font-size:9px">咖啡啟動<div class="tooltip">W1｜咖啡會議說明會 + 提交預計邀約名單</div></div></div>
+    <div class="task-cell"><div class="bar c-amber" style="font-size:9px">咖啡追蹤<div class="tooltip">W2｜開始約咖啡 + 例會教育培訓</div></div></div>
+    <div class="task-cell closed-col"><div class="bar c-red" style="font-size:9px">PD 參與<div class="tooltip">W3｜全員參與 Power Day + 公開承諾邀賓件數</div></div></div>
+    <div class="task-cell"><div class="bar c-green" style="font-size:9px">填邀請函<div class="tooltip">W4｜收到空白邀請函開始填寫</div></div></div>
+    <div class="task-cell"><div class="bar c-green" style="font-size:9px">繳邀請函<div class="tooltip">W5｜例會繳回邀請函 + 咖啡持續</div></div></div>
+    <div class="task-cell"><div class="bar c-amber" style="font-size:9px">咖啡深化<div class="tooltip">W6｜中熱度賓客再約咖啡</div></div></div>
+    <div class="task-cell"><div class="bar c-dark" style="font-size:9px">接龍+衝刺<div class="tooltip">W7｜LINE 接龍 + 咖啡持續深化</div></div></div>
+    <div class="task-cell closed-col"><div class="bar c-dark" style="font-size:9px">最後衝刺<div class="tooltip">W8｜低熱度賓客最後一輪接觸</div></div></div>
+    <div class="task-notes">咖啡會議 + 邀賓 + 接龍</div>
+  </div>
+
+  <!-- BOD Day -->
+  <div class="sep-row" style="background:#fff0f0;"><div class="sep-label" style="color:#8B0000;">🏆 2026/8/28 BOD 擴大商機交流日</div></div>
+
+  <div class="task-row" style="background:#fdf0f0;">
+    <div class="task-label" style="font-weight:800;color:#8B0000;">🏆 全體出動</div>
+    <div class="bod-day-cell">
+      接待組長指揮現場 × 配對人專責入會說明 × 全員陪伴賓客 × 事後追蹤
+    </div>
+    <div class="task-notes" style="color:#8B0000;font-weight:700;">8/28 全員出動</div>
+  </div>
+
+  <!-- Footer -->
+  <div class="gantt-footer">
+    <div class="gf-label">週次標記</div>
+    <div class="gf-cell" style="color:#3A7BD5;font-weight:700;">W1<br>啟動</div>
+    <div class="gf-cell" style="color:#3A7BD5;font-weight:700;">W2<br>備戰</div>
+    <div class="gf-cell" style="color:#C0392B;font-weight:700;">W3🔒<br>Power Day</div>
+    <div class="gf-cell" style="color:#5B9A5B;font-weight:700;">W4<br>發信</div>
+    <div class="gf-cell" style="color:#5B9A5B;font-weight:700;">W5<br>唱名收齊</div>
+    <div class="gf-cell" style="color:#D46020;font-weight:700;">W6<br>統一郵寄</div>
+    <div class="gf-cell" style="color:#8B0000;font-weight:700;">W7<br>接龍熱度</div>
+    <div class="gf-cell" style="color:#8B0000;font-weight:700;">W8🔒<br>封閉②</div>
+    <div class="gf-cell" style="color:#8B0000;font-weight:700;">8/28<br>BOD🏆</div>
+  </div>
+
+</div>
+
+<!-- Summary cards -->
+<div class="summary-row">
+  <div class="summary-card" style="border-color:#3A7BD5">
+    <div class="sc-num">10</div>
+    <div class="sc-label">職務角色<br>（含全體會員）</div>
+  </div>
+  <div class="summary-card" style="border-color:#6B3FA0">
+    <div class="sc-num">3</div>
+    <div class="sc-label">主席旗下角色<br>（主席 / 小組長 / 網站管理員）</div>
+  </div>
+  <div class="summary-card" style="border-color:#5B9A5B">
+    <div class="sc-num">秘書財務</div>
+    <div class="sc-label">邀請函四關全程主責<br>（印→發→收→寄）</div>
+  </div>
+  <div class="summary-card" style="border-color:#0097A7">
+    <div class="sc-num">教育協調員</div>
+    <div class="sc-label">每週三分鐘培訓主責<br>（除封閉週外每週）</div>
+  </div>
+  <div class="summary-card" style="border-color:#C0392B">
+    <div class="sc-num">3</div>
+    <div class="sc-label">Power Day 主持人<br>（教育/主席/成長協調員）</div>
+  </div>
+  <div class="summary-card" style="border-color:#8B0000">
+    <div class="sc-num">8/28</div>
+    <div class="sc-label">決戰日<br>全員出動</div>
+  </div>
+</div>
+
+</body>
+</html>
