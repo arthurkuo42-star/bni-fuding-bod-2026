@@ -11,7 +11,6 @@
     background: #f5f0eb;
     padding: 24px;
     color: #1a1a1a;
-    min-width: 900px;
   }
 
   /* ── Header ── */
@@ -57,13 +56,53 @@
     background: #fff;
     border-radius: 14px;
     box-shadow: 0 2px 14px rgba(0,0,0,0.08);
-    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Swipe hint (mobile only) */
+  .swipe-hint {
+    display: none;
+    text-align: center;
+    font-size: 12px;
+    color: #8B0000;
+    padding: 10px;
+    background: #fff;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    body { padding: 12px; }
+    .page-header {
+      flex-direction: column;
+      gap: 14px;
+      padding: 18px 20px;
+      text-align: center;
+      align-items: stretch;
+    }
+    .page-header h1 { font-size: 18px; line-height: 1.4; }
+    .page-header .meta { font-size: 11px; }
+    .purpose-badge { font-size: 11px; padding: 10px 14px; }
+    .legend { padding: 10px 12px; gap: 8px; }
+    .legend-item { font-size: 11px; }
+    .swipe-hint { display: block; }
+    .summary-row { gap: 8px; }
+    .summary-card {
+      min-width: calc(50% - 4px);
+      padding: 10px 14px;
+    }
+    .summary-card .sc-num { font-size: 22px; }
+    .summary-card .sc-label { font-size: 10px; }
   }
 
   /* ── Week header row ── */
   .week-header-row {
     display: grid;
-    grid-template-columns: 220px repeat(8, 1fr) 160px;
+    grid-template-columns: 220px repeat(8, minmax(80px, 1fr)) 160px;
     background: #2e2e2e;
   }
   .wh-label {
@@ -103,7 +142,7 @@
   /* ── Section header ── */
   .section-header {
     display: grid;
-    grid-template-columns: 220px repeat(8, 1fr) 160px;
+    grid-template-columns: 220px repeat(8, minmax(80px, 1fr)) 160px;
     background: #3a3a3a;
     border-top: 1px solid #555;
   }
@@ -121,7 +160,7 @@
   /* ── Task row ── */
   .task-row {
     display: grid;
-    grid-template-columns: 220px repeat(8, 1fr) 160px;
+    grid-template-columns: 220px repeat(8, minmax(80px, 1fr)) 160px;
     border-top: 1px solid #f0f0f0;
     transition: background 0.15s;
   }
@@ -241,7 +280,7 @@
 
   .sep-row {
     display: grid;
-    grid-template-columns: 220px repeat(8, 1fr) 160px;
+    grid-template-columns: 220px repeat(8, minmax(80px, 1fr)) 160px;
     background: #f8f8f8;
     border-top: 2px solid #e5e5e5;
     border-bottom: 1px solid #e5e5e5;
@@ -259,7 +298,7 @@
   /* Footer */
   .gantt-footer {
     display: grid;
-    grid-template-columns: 220px repeat(8, 1fr) 160px;
+    grid-template-columns: 220px repeat(8, minmax(80px, 1fr)) 160px;
     background: #f5f5f5;
     border-top: 2px solid #ddd;
   }
@@ -334,6 +373,9 @@
   <div class="legend-item"><div class="legend-dot c-purple"></div>全程持續任務</div>
   <div class="legend-item" style="margin-left:auto; color:#C0392B; font-weight:700; font-size:12px;">🔒 = 封閉會議</div>
 </div>
+
+<!-- Swipe hint (mobile only) -->
+<div class="swipe-hint">← 左右滑動檢視完整甘特圖 →</div>
 
 <!-- Gantt table -->
 <div class="gantt-wrapper">
