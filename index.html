@@ -60,6 +60,16 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  /* 強制所有 grid row 至少 1020px (220 + 8*80 + 160)
+     避免手機上背景被父容器寬度切掉，造成 W3 之後變慘白 */
+  .week-header-row,
+  .section-header,
+  .task-row,
+  .sep-row,
+  .gantt-footer {
+    min-width: 1020px;
+  }
+
   /* Swipe hint (mobile only) */
   .swipe-hint {
     display: none;
